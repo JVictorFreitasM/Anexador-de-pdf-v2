@@ -1,73 +1,70 @@
-# Anexador de PDF
+# PDF Local
 
-Aplicação web simples para juntar (mesclar) vários arquivos PDF em um único arquivo, direto pelo navegador.
+Uma ferramenta pequena para juntar e organizar PDFs sem enviar documentos a um servidor. Todo o processamento acontece localmente no navegador: os arquivos permanecem no dispositivo do usuário.
 
-<img width="1250" height="496" alt="Organizador-de-PDFs-07-21-2026_10_54_AM" src="https://github.com/user-attachments/assets/534e09fb-d787-4079-a5d9-897a41f244bd" />
+## Recursos
 
----
-## Funcionalidades
+- Juntar PDFs com ordenação natural por nome (`arquivo2.pdf` vem antes de `arquivo10.pdf`), seleção de ordenação e reordenação manual.
+- Prévia da primeira página, quantidade de páginas e tamanho de cada arquivo.
+- Organizar páginas: arrastar, remover, girar, extrair intervalos, adicionar marca d’água e numeração configuráveis.
+- Dividir PDFs por intervalos ou a cada quantidade de páginas.
+- Criar um PDF a partir de imagens JPG ou PNG, com reordenação manual.
+- Downloads locais com nome de arquivo personalizável, avisos para arquivos grandes e carregamento gradual das miniaturas.
 
-- Upload de múltiplos arquivos PDF
-- Ordenação automática dos arquivos pelo nome (ordem numérica/alfabética)
-- Mesclagem de todos os PDFs em um único arquivo
-- Download do PDF final gerado
+## Rodar localmente
 
-## Tecnologias
+Não há dependências Node nem servidor de processamento. Basta servir a pasta `public` como arquivos estáticos. Por exemplo, com qualquer servidor estático instalado na máquina:
 
-- [Node.js](https://nodejs.org/)
-- [Express](https://expressjs.com/) — servidor web
-- [Multer](https://github.com/expressjs/multer) — upload de arquivos
-- [pdf-merger-js](https://www.npmjs.com/package/pdf-merger-js) — mesclagem dos PDFs
-- HTML, CSS e JavaScript puro no front-end
-
-## Como rodar localmente
-
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/JVictorFreitasM/Anexador-de-pdf.git
-   cd Anexador-de-pdf
-   ```
-
-2. Instale as dependências:
-   ```bash
-   npm install
-   ```
-
-3. Inicie o servidor:
-   ```bash
-   node server.js
-   ```
-
-4. Acesse no navegador:
-   ```
-   http://localhost:3987
-   ```
-
-## Como usar
-
-1. Abra a aplicação no navegador.
-2. Selecione os arquivos PDF que deseja juntar.
-3. Envie os arquivos para mesclagem.
-4. Baixe o PDF final já unificado.
-
-## Estrutura do projeto
-
-```
-Anexador-de-pdf/
-├── public/
-│   ├── index.html    # Página principal
-│   ├── style.css      # Estilos
-│   └── app.js         # Lógica do front-end
-├── server.js           # Servidor Express e rota de mesclagem
-├── package.json
-└── package-lock.json
+```bash
+npx serve public
 ```
 
-## Observações
+Abra o endereço informado pelo comando. Para que as bibliotecas de PDF e as fontes sejam carregadas, o navegador precisa de acesso à internet na primeira utilização, pois elas são obtidas de CDNs públicos.
 
-- Os arquivos enviados são armazenados temporariamente na pasta `uploads/` e removidos automaticamente após a mesclagem.
-- O PDF final é salvo na pasta `merged/` com um nome único baseado em timestamp (ex: `LOTE_1234567890.pdf`).
+## Deploy no Render
 
-## Licença
+1. Crie um **Static Site** e conecte este repositório.
+2. Use `public` como **Publish Directory**.
+3. Deixe o **Build Command** vazio.
+4. Faça o deploy.
 
-ISC
+Não configure um Start Command: esta aplicação não possui backend, banco de dados, armazenamento persistente ou endpoints de upload.
+
+## Privacidade
+
+Os PDFs, imagens, nomes de arquivos e metadados são lidos e manipulados somente no contexto do navegador. Nada é enviado pelo aplicativo ao Render ou a outro servidor para processar documentos.
+
+## Estrutura
+
+```text
+public/
+├── index.html
+├── style.css
+├── advanced.css      # controles avançados e visualização ampliada
+└── js/
+    ├── app.js          # estado e interface
+    ├── pdf-tools.js    # operações com pdf-lib
+    ├── preview.js      # prévias com PDF.js
+    └── utils.js
+```
+
+As bibliotecas [pdf-lib](https://pdf-lib.js.org/) e [PDF.js](https://mozilla.github.io/pdf.js/) são carregadas no browser. O projeto não usa Express, Multer ou `pdf-merger-js`.
+
+## Qualidade e CI/CD
+
+Instale as dependências de desenvolvimento e execute todas as verificações localmente:
+
+```bash
+npm ci
+npm run check
+```
+
+O workflow [CI/CD](.github/workflows/ci-cd.yml) é executado em cada `push` e pull request para `main`. Ele executa o ESLint e os testes automatizados antes do deploy.
+
+Para permitir que o GitHub Actions dispare o deploy no Render depois que essas verificações passarem:
+
+1. No painel do Render, crie um **Deploy Hook** para o Static Site.
+2. No GitHub, em **Settings → Secrets and variables → Actions**, crie o secret `RENDER_DEPLOY_HOOK_URL` com a URL do hook.
+3. No Render, desative o Auto-Deploy para evitar dois deploys para o mesmo commit.
+
+Sem esse secret, o job de deploy termina sem publicar nada; nesse caso, você pode manter o Auto-Deploy nativo do Render ativado.
