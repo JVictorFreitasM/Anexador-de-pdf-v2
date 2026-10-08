@@ -20,8 +20,8 @@ async function addPdfs(files) {
   const valid = files.filter(file => isPdf(file) && file.size > 0);
   if (!valid.length) return notify('Selecione arquivos PDF válidos e não vazios.', true);
   if (valid.length !== files.length) notify('Arquivos que não são PDF ou estão vazios foram ignorados.', true);
-  largeFileWarning(valid); showStatus('Lendo seus arquivos', 'Verificando páginas e criando prévias…');
-  for (const file of valid) { try { const pages = await getPageCount(file); let preview = ''; try { preview = await previewPage(file, 1, 70); } catch (error) { console.warn('Prévia indisponível:', error); } state.files.push({ id: crypto.randomUUID(), file, pages, preview, selection: state.files.length }); } catch (error) { console.error(error); notify('Não foi possível abrir “' + file.name + '”.', true); } }
+  largeFileWarning(valid); showStatus('Lendo seus arquivos', 'Verificando páginas…');
+  for (const file of valid) { try { const pages = await getPageCount(file); const item = { id: crypto.randomUUID(), file, pages, preview: '', selection: state.files.length }; state.files.push(item); previewPage(file, 1, 70).then(preview => { item.preview = preview; renderFiles(); }).catch(error => console.warn('Prévia indisponível:', error)); } catch (error) { console.error(error); notify('Não foi possível abrir “' + file.name + '”.', true); } }
   state.files.sort(naturalCompare); renderFiles(); hideStatus();
 }
 function sortFiles(mode) { const comparators = { 'name-asc': naturalCompare, 'name-desc': (a, b) => naturalCompare(b, a), 'size-asc': (a, b) => a.file.size - b.file.size, 'size-desc': (a, b) => b.file.size - a.file.size, 'pages-asc': (a, b) => a.pages - b.pages, 'pages-desc': (a, b) => b.pages - a.pages, selection: (a, b) => a.selection - b.selection }; state.files.sort(comparators[mode]); renderFiles(); }
