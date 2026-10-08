@@ -1,4 +1,5 @@
-export const naturalCompare = (a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+const getName = item => item.name ?? item.file?.name ?? '';
+export const naturalCompare = (a, b) => getName(a).localeCompare(getName(b), undefined, { numeric: true, sensitivity: 'base' });
 export const formatBytes = bytes => bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`;
 export const safePdfName = (name, fallback = 'documento') => `${(name || fallback).trim().replace(/\.pdf$/i, '').replace(/[\\/:*?"<>|]/g, '-') || fallback}.pdf`;
 export const baseName = name => name.replace(/\.[^/.]+$/, '');

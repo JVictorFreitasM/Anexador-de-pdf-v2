@@ -8,6 +8,12 @@ test('ordena arquivos em ordem natural pelo nome', () => {
   assert.deepEqual(files.sort(naturalCompare).map(file => file.name), ['arquivo1.pdf', 'arquivo2.pdf', 'arquivo10.pdf']);
 });
 
+test('ordena os itens internos que armazenam o arquivo na propriedade file', () => {
+  const files = [{ file: { name: 'lote10.pdf' } }, { file: { name: 'lote2.pdf' } }];
+
+  assert.deepEqual(files.sort(naturalCompare).map(item => item.file.name), ['lote2.pdf', 'lote10.pdf']);
+});
+
 test('formata tamanhos de arquivo', () => {
   assert.equal(formatBytes(1024), '1 KB');
   assert.equal(formatBytes(1024 * 1024 * 2.4), '2,4 MB');
