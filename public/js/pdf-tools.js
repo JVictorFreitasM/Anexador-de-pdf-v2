@@ -93,7 +93,7 @@ export async function decoratePageState(file, states, options) {
     if (options.watermark?.text) {
       const { text, size, opacity, position } = options.watermark;
       const point = coordinates(page, text, font, size, position, 34);
-      page.drawText(text, { ...point, size, font, opacity, color: rgb(.08, .4, .26) });
+      page.drawText(text, { ...point, size, font, opacity, color: rgb(.259, .282, .58) });
     }
     if (options.numbering && index + 1 >= options.numbering.fromPage) {
       const number = options.numbering.initial + (index + 1 - options.numbering.fromPage);
